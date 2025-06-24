@@ -445,6 +445,121 @@ h1 {
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
 }
 
+/* Genre-based Movies Styles */
+.movies-by-genre {
+  margin: 20px 0;
+}
+
+.page-title {
+  color: white;
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2.2rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.genre-section {
+  margin-bottom: 50px;
+}
+
+.genre-title {
+  color: white;
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+  text-align: left;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  border-left: 4px solid #667eea;
+  padding-left: 15px;
+}
+
+.genre-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.genre-movie-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.genre-movie-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+}
+
+.genre-movie-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.genre-movie-card img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.genre-movie-card:hover img {
+  transform: scale(1.05);
+}
+
+.genre-movie-rating {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.8);
+  color: #FFD700;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.genre-movie-year {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255,255,255,0.9);
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.genre-movie-content {
+  padding: 15px;
+}
+
+.genre-movie-title {
+  font-size: 1rem;
+  margin: 0 0 15px 0;
+  color: #333;
+  line-height: 1.3;
+  height: 2.6em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.genre-movie-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.genre-movie-actions .btn-small {
+  flex: 1;
+  text-align: center;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   body {
@@ -467,6 +582,23 @@ h1 {
 
   .trending-card img {
     height: 220px;
+  }
+
+  .genre-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+  }
+
+  .genre-movie-card img {
+    height: 240px;
+  }
+
+  .page-title {
+    font-size: 1.8rem;
+  }
+
+  .genre-title {
+    font-size: 1.4rem;
   }
 
   .card-actions {

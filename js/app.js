@@ -39,8 +39,8 @@ function initializeApp() {
     }
   }
 
-  // Load trending content on startup
-  loadTrendingContent();
+  // Load movies by genre on startup (landing page)
+  loadMoviesByGenre();
 
   console.log('🎬 CinemaxParadiso initialized successfully!');
 }
@@ -192,6 +192,135 @@ function createTrendingCard(item) {
   `;
 }
 
+// Genre-based Movie Loading Functions
+async function loadMoviesByGenre() {
+  resultsDiv.innerHTML = '<div class="loading">Loading latest movies...</div>';
+
+  try {
+    // Popular genres to display (limiting to most popular ones)
+    const popularGenres = [
+      { id: 28, name: 'Action' },
+      { id: 12, name: 'Adventure' },
+      { id: 16, name: 'Animation' },
+      { id: 35, name: 'Comedy' },
+      { id: 80, name: 'Crime' },
+      { id: 18, name: 'Drama' },
+      { id: 14, name: 'Fantasy' },
+      { id: 27, name: 'Horror' },
+      { id: 10749, name: 'Romance' },
+      { id: 878, name: 'Science Fiction' },
+      { id: 53, name: 'Thriller' }
+    ];
+
+    // Fetch movies for each genre
+    const genreMovies = await Promise.all(
+      popularGenres.map(async (genre) => {
+        const movies = await fetchMoviesByGenre(genre.id);
+        return {
+          genre: genre.name,
+          movies: movies.slice(0, 15) // First 15 movies
+        };
+      })
+    );
+
+    displayMoviesByGenre(genreMovies);
+  } catch (error) {
+    console.error('Error loading movies by genre:', error);
+    resultsDiv.innerHTML = '<div class="error">Error loading movies. Please try again.</div>';
+  }
+}
+
+async function fetchMovieGenres() {
+  try {
+    const response = await fetch(
+      `${TMDB_BASE_URL}/genre/movie/list?api_key=${TMDB_API_KEY}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.genres;
+  } catch (error) {
+    console.error('Error fetching movie genres:', error);
+    return [];
+  }
+}
+
+async function fetchMoviesByGenre(genreId) {
+  try {
+    const response = await fetch(
+      `${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=${genreId}&sort_by=release_date.desc&page=1`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.results.map(movie => ({
+      ...movie,
+      media_type: 'movie' // Add media_type for consistency
+    }));
+  } catch (error) {
+    console.error(`Error fetching movies for genre ${genreId}:`, error);
+    return [];
+  }
+}
+
+function displayMoviesByGenre(genreMovies) {
+  const genreHtml = genreMovies
+    .filter(genreData => genreData.movies.length > 0) // Only show genres with movies
+    .map(genreData => `
+      <div class="genre-section">
+        <h2 class="genre-title">${genreData.genre}</h2>
+        <div class="genre-grid">
+          ${genreData.movies.map(movie => createGenreMovieCard(movie)).join('')}
+        </div>
+      </div>
+    `).join('');
+
+  const fullHtml = `
+    <div class="movies-by-genre">
+      <h1 class="page-title">🎬 Latest Movies by Genre</h1>
+      ${genreHtml}
+    </div>
+  `;
+
+  resultsDiv.innerHTML = fullHtml;
+}
+
+function createGenreMovieCard(movie) {
+  const title = movie.title || 'No Title';
+  const poster = movie.poster_path
+    ? `${TMDB_IMAGE_BASE_URL}/w300${movie.poster_path}`
+    : 'https://via.placeholder.com/300x450?text=No+Image';
+  const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';
+  const releaseDate = movie.release_date ? new Date(movie.release_date).getFullYear() : 'TBA';
+
+  return `
+    <div class="genre-movie-card" data-id="${movie.id}" data-type="movie">
+      <div class="genre-movie-image">
+        <img src="${poster}" alt="${title}" loading="lazy">
+        <div class="genre-movie-rating">${rating}</div>
+        <div class="genre-movie-year">${releaseDate}</div>
+      </div>
+      <div class="genre-movie-content">
+        <h4 class="genre-movie-title">${title}</h4>
+        <div class="genre-movie-actions">
+          <button class="btn-small btn-primary" onclick='addToWatchlist(${JSON.stringify(movie).replace(/'/g, "&apos;")})'>
+            + Watchlist
+          </button>
+          <button class="btn-small btn-secondary" onclick='viewDetails(${movie.id}, "movie")'>
+            Details
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 // View switchers
 searchViewBtn.addEventListener('click', () => {
   showView('search');
@@ -221,9 +350,9 @@ function showView(viewName) {
     case 'search':
       searchView.style.display = 'block';
       searchViewBtn.classList.add('active');
-      // Load trending content in search view if search is empty
+      // Load movies by genre in search view if search is empty
       if (!searchInput.value.trim()) {
-        loadTrendingContent();
+        loadMoviesByGenre();
       }
       break;
     case 'trending':
@@ -247,8 +376,8 @@ searchInput.addEventListener('input', () => {
     if (query) {
       searchMovies(query);
     } else {
-      // Show trending content when search is empty
-      loadTrendingContent();
+      // Show movies by genre when search is empty
+      loadMoviesByGenre();
     }
   }, 500);
 });
