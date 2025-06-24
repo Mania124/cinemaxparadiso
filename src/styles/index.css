@@ -471,7 +471,6 @@ h1 {
 
 .genre-section {
   margin-bottom: 40px;
-  padding: 0 20px;
 }
 
 .genre-title {
@@ -482,15 +481,17 @@ h1 {
   text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
   border-left: 4px solid #667eea;
   padding-left: 15px;
+  margin-left: 20px;
 }
 
 .genre-horizontal-scroll {
   display: flex;
   gap: 15px;
   overflow-x: auto;
-  padding-bottom: 10px;
+  padding: 0 20px 10px 20px;
   scroll-behavior: smooth;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .genre-horizontal-scroll::-webkit-scrollbar {
@@ -518,7 +519,7 @@ h1 {
   box-shadow: 0 6px 20px rgba(0,0,0,0.1);
   transition: all 0.3s ease;
   cursor: pointer;
-  min-width: 250px;
+  min-width: 280px;
   flex-shrink: 0;
 }
 
@@ -625,10 +626,11 @@ h1 {
 
   .genre-horizontal-scroll {
     gap: 12px;
+    padding: 0 15px 10px 15px;
   }
 
   .genre-movie-card {
-    min-width: 150px;
+    min-width: 200px;
   }
 
   .genre-movie-card img {
@@ -637,10 +639,12 @@ h1 {
 
   .page-title {
     font-size: 1.8rem;
+    padding: 0 15px;
   }
 
   .genre-title {
     font-size: 1.4rem;
+    margin-left: 15px;
   }
 
   .card-actions {
