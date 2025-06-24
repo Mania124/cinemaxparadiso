@@ -1,7 +1,9 @@
-// API Configuration
-const TMDB_API_KEY = '4e638237159859e0abbb6b15c1a693e4'; // TODO: Move to environment variables
-const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
-const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
+// API Configuration - Now loaded from config.js
+const TMDB_API_KEY = AppConfig.get('TMDB_API_KEY');
+const OMDB_API_KEY = AppConfig.get('OMDB_API_KEY');
+const TMDB_BASE_URL = AppConfig.get('TMDB_BASE_URL');
+const OMDB_BASE_URL = AppConfig.get('OMDB_BASE_URL');
+const TMDB_IMAGE_BASE_URL = AppConfig.get('TMDB_IMAGE_BASE_URL');
 // DOM Elements
 const searchInput = document.getElementById('search-input');
 const resultsDiv = document.getElementById('results');
@@ -15,6 +17,27 @@ const watchlistView = document.getElementById('watchlist-view');
 let debounceTimeout = null;
 let currentPage = 1;
 let totalPages = 1;
+
+// Initialize app and validate configuration
+document.addEventListener('DOMContentLoaded', () => {
+  initializeApp();
+});
+
+function initializeApp() {
+  // Validate API configuration
+  const configValidation = AppConfig.validateConfig();
+
+  if (!configValidation.isValid) {
+    console.warn('⚠️ Configuration Issues:', configValidation.issues);
+
+    // Show user-friendly message for missing OMDB key
+    if (configValidation.issues.some(issue => issue.includes('OMDB'))) {
+      showNotification('OMDB API not configured. Some features may be limited.', 'warning');
+    }
+  }
+
+  console.log('🎬 CinemaxParadiso initialized successfully!');
+}
 
 // View switchers
 searchViewBtn.addEventListener('click', () => {
