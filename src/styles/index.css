@@ -79,14 +79,11 @@ h1 {
 }
 
 /* Override grid for genre-based content */
-#results,.movies-by-genre {
-  display: flex;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-  padding: 0 20px;
+.movies-by-genre {
+  display: block;
+  width: auto;
+  padding: 0;
 }
-
 /* Card Styles */
 .card {
   background: rgba(255,255,255,0.95);
@@ -506,7 +503,7 @@ h1 {
 }
 
 .genre-title {
-  color: white;
+  color: white !important;
   font-size: 1.5rem;
   margin-bottom: 20px;
   text-align: left;
