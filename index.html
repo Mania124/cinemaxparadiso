@@ -2,13 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Cinemaxparadiso</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CinemaxParadiso - Movie & TV Discovery</title>
   <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-    <h1>Cinemaxparadiso</h1>
-    <input type="text" id="search-input" placeholder="Search for movies or TV shows..." />
-    <div id="results"></div>
+    <h1>🎬 CinemaxParadiso</h1>
+
+    <!-- Navigation -->
+    <div class="nav-buttons">
+        <button id="search-view-btn" class="active">🔍 Search</button>
+        <button id="watchlist-view-btn">📋 My Watchlist</button>
+    </div>
+
+    <!-- Search View -->
+    <div id="search-view">
+        <input type="text" id="search-input" placeholder="Search for movies or TV shows..." />
+        <div id="results"></div>
+    </div>
+
+    <!-- Watchlist View -->
+    <div id="watchlist-view" style="display: none;">
+        <div id="watchlist"></div>
+    </div>
 
     <script src="js/app.js"></script>
 </body>
