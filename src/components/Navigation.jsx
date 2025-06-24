@@ -10,6 +10,7 @@ const Navigation = ({ currentView, onViewChange, contentType, onContentTypeChang
   const navItems = [
     { id: 'search', label: '🔍 Search', icon: '🔍' },
     { id: 'trending', label: '🔥 Trending', icon: '🔥' },
+    { id: 'recommendations', label: '🎯 For You', icon: '🎯' },
     { id: 'watchlist', label: '📋 My Watchlist', icon: '📋' }
   ]
 

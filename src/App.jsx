@@ -3,6 +3,7 @@ import Header from './components/Header'
 import Navigation from './components/Navigation'
 import SearchView from './components/SearchView'
 import TrendingView from './components/TrendingView'
+import RecommendationsView from './components/RecommendationsView'
 import WatchlistView from './components/WatchlistView'
 import MovieDetails from './components/MovieDetails'
 import { AppConfig } from './services/config'
@@ -62,6 +63,8 @@ function App() {
         return <SearchView showSearchInput={showSearchInput} onSearchInputToggle={setShowSearchInput} contentType={contentType} onMovieSelect={handleMovieSelect} />
       case 'trending':
         return <TrendingView contentType={contentType} onMovieSelect={handleMovieSelect} />
+      case 'recommendations':
+        return <RecommendationsView onMovieSelect={handleMovieSelect} />
       case 'watchlist':
         return <WatchlistView contentType={contentType} onMovieSelect={handleMovieSelect} />
       default:

@@ -371,6 +371,29 @@ class MovieService {
       }
     ]
   }
+
+  // Get movies by genre ID (for recommendations)
+  async getMoviesByGenre(genreId, page = 1) {
+    if (!this.tmdbApiKey) {
+      throw new Error('TMDB API key not configured')
+    }
+
+    try {
+      const response = await fetch(
+        `${AppConfig.TMDB_BASE_URL}/discover/movie?api_key=${this.tmdbApiKey}&with_genres=${genreId}&page=${page}&sort_by=popularity.desc&vote_count.gte=100`
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      return data.results || []
+    } catch (error) {
+      console.error(`Error fetching movies for genre ${genreId}:`, error)
+      return []
+    }
+  }
 }
 
 export const movieService = new MovieService()

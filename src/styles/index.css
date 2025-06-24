@@ -1111,6 +1111,67 @@ h1 {
     width: 200px;
   }
 
+  /* Recommendations Mobile */
+  .recommendations-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    padding: 0 15px;
+  }
+
+  .refresh-btn {
+    align-self: center;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+  }
+
+  .preferences-summary {
+    margin: 0 15px 25px 15px;
+    padding: 15px;
+  }
+
+  .preference-stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .stat-item {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .favorite-genres {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .empty-recommendations {
+    padding: 0 15px;
+  }
+
+  .empty-state {
+    padding: 20px 15px;
+  }
+
+  .empty-tips {
+    padding: 15px;
+  }
+
+  .recommendations-info {
+    margin: 0 15px 15px 15px;
+  }
+
+  .recommendations-info p {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+
+  .no-recommendations {
+    margin: 15px;
+    padding: 20px 15px;
+  }
+
   /* Movie Details Mobile */
   .movie-details-overlay {
     padding: 10px;
@@ -1178,4 +1239,200 @@ h1 {
   .movie-details-actions {
     flex-direction: column;
   }
+}
+
+/* Recommendations Styles */
+.recommendations-view {
+  margin: 20px 0;
+}
+
+.recommendations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 0 20px;
+}
+
+.refresh-btn {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.refresh-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 12px rgba(102, 126, 234, 0.4);
+}
+
+.preferences-summary {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 0 20px 30px 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.preferences-summary h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.preference-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.stat-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.stat-value {
+  color: #333;
+  font-weight: 600;
+}
+
+.favorite-genres {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.genres-label {
+  color: #666;
+  font-weight: 500;
+  min-width: fit-content;
+}
+
+.genre-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.genre-tag {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.recommendations-content {
+  margin-top: 20px;
+}
+
+.recommendations-info {
+  margin: 0 20px 20px 20px;
+  text-align: center;
+}
+
+.recommendations-info p {
+  color: white;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px 20px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  margin: 0;
+}
+
+.empty-recommendations {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 0 20px;
+}
+
+.empty-state {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  max-width: 600px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.empty-state h3 {
+  color: #333;
+  margin: 0 0 15px 0;
+  font-size: 1.5rem;
+}
+
+.empty-state p {
+  color: #666;
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+.empty-tips {
+  text-align: left;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.empty-tips h4 {
+  color: #333;
+  margin: 0 0 15px 0;
+}
+
+.empty-tips ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.empty-tips li {
+  color: #666;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.no-recommendations {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  padding: 30px;
+  margin: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.no-recommendations h3 {
+  color: #333;
+  margin: 0 0 15px 0;
+  font-size: 1.3rem;
+}
+
+.no-recommendations p {
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
 }
