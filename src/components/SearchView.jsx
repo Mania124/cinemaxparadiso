@@ -4,7 +4,7 @@ import { useMoviesByGenre } from '../hooks/useMoviesByGenre'
 import MovieGrid from './MovieGrid'
 import GenreSection from './GenreSection'
 
-const SearchView = () => {
+const SearchView = ({ showSearchInput, onSearchInputToggle }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const { movies: searchResults, loading: searchLoading, error: searchError, searchMovies } = useMovieSearch()
   const { genreMovies, loading: genreLoading, error: genreError } = useMoviesByGenre()
@@ -19,6 +19,13 @@ const SearchView = () => {
     return () => clearTimeout(timeoutId)
   }, [searchQuery, searchMovies])
 
+  useEffect(() => {
+    // Clear search when input is hidden
+    if (!showSearchInput) {
+      setSearchQuery('')
+    }
+  }, [showSearchInput])
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value)
   }
@@ -29,15 +36,18 @@ const SearchView = () => {
 
   return (
     <div className="search-view">
-      <div className="search-input-container">
-        <input
-          type="text"
-          id="search-input"
-          placeholder="Search for movies or TV shows..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-      </div>
+      {showSearchInput && (
+        <div className="search-input-container">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search for movies or TV shows..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            autoFocus
+          />
+        </div>
+      )}
 
       <div id="results" className={showGenreView ? 'genre-view' : ''}>
         {loading && <div className="loading">Loading...</div>}

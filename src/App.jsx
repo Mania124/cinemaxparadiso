@@ -10,6 +10,7 @@ import './styles/App.css'
 function App() {
   const [currentView, setCurrentView] = useState('search')
   const [isConfigured, setIsConfigured] = useState(false)
+  const [showSearchInput, setShowSearchInput] = useState(false)
 
   useEffect(() => {
     // Check if API keys are configured
@@ -29,23 +30,34 @@ function App() {
     )
   }
 
+  const handleViewChange = (view) => {
+    if (view === 'search' && currentView === 'search') {
+      // If already on search view and search button clicked, toggle search input
+      setShowSearchInput(!showSearchInput)
+    } else {
+      // Switch to different view
+      setCurrentView(view)
+      setShowSearchInput(false) // Hide search input when switching views
+    }
+  }
+
   const renderCurrentView = () => {
     switch (currentView) {
       case 'search':
-        return <SearchView />
+        return <SearchView showSearchInput={showSearchInput} onSearchInputToggle={setShowSearchInput} />
       case 'trending':
         return <TrendingView />
       case 'watchlist':
         return <WatchlistView />
       default:
-        return <SearchView />
+        return <SearchView showSearchInput={showSearchInput} onSearchInputToggle={setShowSearchInput} />
     }
   }
 
   return (
     <div className="app">
       <Header />
-      <Navigation currentView={currentView} onViewChange={setCurrentView} />
+      <Navigation currentView={currentView} onViewChange={handleViewChange} />
       <main className="main-content">
         {renderCurrentView()}
       </main>
