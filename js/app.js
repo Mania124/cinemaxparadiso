@@ -36,7 +36,114 @@ function initializeApp() {
     }
   }
 
+  // Load trending content on startup
+  loadTrendingContent();
+
   console.log('🎬 CinemaxParadiso initialized successfully!');
+}
+
+// Trending Content Functions
+async function loadTrendingContent() {
+  try {
+    const [trendingMovies, trendingTV] = await Promise.all([
+      fetchTrendingMovies(),
+      fetchTrendingTV()
+    ]);
+
+    displayTrendingContent(trendingMovies, trendingTV);
+  } catch (error) {
+    console.error('Error loading trending content:', error);
+  }
+}
+
+async function fetchTrendingMovies() {
+  try {
+    const response = await fetch(
+      `${TMDB_BASE_URL}/trending/movie/week?api_key=${TMDB_API_KEY}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.results.slice(0, 10); // Get top 10
+  } catch (error) {
+    console.error('Error fetching trending movies:', error);
+    return [];
+  }
+}
+
+async function fetchTrendingTV() {
+  try {
+    const response = await fetch(
+      `${TMDB_BASE_URL}/trending/tv/week?api_key=${TMDB_API_KEY}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.results.slice(0, 10); // Get top 10
+  } catch (error) {
+    console.error('Error fetching trending TV shows:', error);
+    return [];
+  }
+}
+
+function displayTrendingContent(movies, tvShows) {
+  // This will be displayed in the search view initially
+  if (searchInput.value.trim() === '') {
+    const trendingHtml = `
+      <div class="trending-section">
+        <h2 class="trending-title">🔥 Trending This Week</h2>
+
+        <div class="trending-category">
+          <h3 class="category-title">Movies</h3>
+          <div class="trending-grid">
+            ${movies.map(movie => createTrendingCard({...movie, media_type: 'movie'})).join('')}
+          </div>
+        </div>
+
+        <div class="trending-category">
+          <h3 class="category-title">TV Shows</h3>
+          <div class="trending-grid">
+            ${tvShows.map(show => createTrendingCard({...show, media_type: 'tv'})).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    resultsDiv.innerHTML = trendingHtml;
+  }
+}
+
+function createTrendingCard(item) {
+  const title = item.title || item.name || 'No Title';
+  const poster = item.poster_path
+    ? `${TMDB_IMAGE_BASE_URL}/w200${item.poster_path}`
+    : 'https://via.placeholder.com/200x300?text=No+Image';
+  const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+  const popularity = item.popularity ? Math.round(item.popularity) : 0;
+
+  return `
+    <div class="trending-card" data-id="${item.id}" data-type="${item.media_type}">
+      <div class="trending-image">
+        <img src="${poster}" alt="${title}" loading="lazy">
+        <div class="trending-rating">${rating}</div>
+        <div class="trending-popularity">${popularity}</div>
+      </div>
+      <div class="trending-content">
+        <h4 class="trending-title">${title}</h4>
+        <div class="trending-actions">
+          <button class="btn-small btn-primary" onclick='addToWatchlist(${JSON.stringify(item).replace(/'/g, "&apos;")})'>
+            + Watchlist
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 // View switchers
@@ -63,7 +170,8 @@ searchInput.addEventListener('input', () => {
     if (query) {
       searchMovies(query);
     } else {
-      resultsDiv.innerHTML = '';
+      // Show trending content when search is empty
+      loadTrendingContent();
     }
   }, 500);
 });
@@ -82,11 +190,91 @@ async function searchMovies(query, page = 1) {
     const data = await response.json();
     currentPage = data.page;
     totalPages = data.total_pages;
-    displayResults(data.results);
+
+    // Enhance results with OMDB data if available
+    const enhancedResults = await enhanceWithOMDBData(data.results);
+    displayResults(enhancedResults);
   } catch (error) {
     resultsDiv.innerHTML = '<div class="error">Error fetching data. Please try again.</div>';
     console.error('Search error:', error);
   }
+}
+
+// OMDB API Integration
+async function getOMDBData(title, year, type = '') {
+  if (!AppConfig.isConfigured('OMDB_API_KEY')) {
+    return null;
+  }
+
+  try {
+    const searchTitle = encodeURIComponent(title);
+    const typeParam = type === 'tv' ? '&type=series' : type === 'movie' ? '&type=movie' : '';
+    const yearParam = year ? `&y=${year}` : '';
+
+    const response = await fetch(
+      `${OMDB_BASE_URL}/?apikey=${OMDB_API_KEY}&t=${searchTitle}${yearParam}${typeParam}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`OMDB HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.Response === 'True') {
+      return {
+        imdbRating: data.imdbRating !== 'N/A' ? data.imdbRating : null,
+        rottenTomatoesRating: extractRottenTomatoesRating(data.Ratings),
+        metacriticRating: data.Metascore !== 'N/A' ? data.Metascore : null,
+        plot: data.Plot !== 'N/A' ? data.Plot : null,
+        director: data.Director !== 'N/A' ? data.Director : null,
+        actors: data.Actors !== 'N/A' ? data.Actors : null,
+        awards: data.Awards !== 'N/A' ? data.Awards : null,
+        boxOffice: data.BoxOffice !== 'N/A' ? data.BoxOffice : null
+      };
+    }
+  } catch (error) {
+    console.warn('OMDB API error:', error);
+  }
+
+  return null;
+}
+
+function extractRottenTomatoesRating(ratings) {
+  if (!ratings || !Array.isArray(ratings)) return null;
+
+  const rtRating = ratings.find(rating => rating.Source === 'Rotten Tomatoes');
+  return rtRating ? rtRating.Value : null;
+}
+
+async function enhanceWithOMDBData(tmdbResults) {
+  if (!AppConfig.isConfigured('OMDB_API_KEY')) {
+    return tmdbResults;
+  }
+
+  // Enhance first 5 results to avoid rate limiting
+  const enhancedResults = await Promise.all(
+    tmdbResults.slice(0, 5).map(async (item, index) => {
+      const title = item.title || item.name;
+      const year = item.release_date ? new Date(item.release_date).getFullYear() :
+                   item.first_air_date ? new Date(item.first_air_date).getFullYear() : null;
+
+      // Add delay to respect rate limits
+      if (index > 0) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+
+      const omdbData = await getOMDBData(title, year, item.media_type);
+
+      return {
+        ...item,
+        omdbData: omdbData
+      };
+    })
+  );
+
+  // Return enhanced results + remaining unenhanced results
+  return [...enhancedResults, ...tmdbResults.slice(5)];
 }
 
 function displayResults(results) {
@@ -100,20 +288,24 @@ function displayResults(results) {
     const poster = item.poster_path
       ? `${TMDB_IMAGE_BASE_URL}/w300${item.poster_path}`
       : 'https://via.placeholder.com/300x450?text=No+Image';
-    const overview = item.overview || 'No description available.';
+    const overview = item.overview || (item.omdbData?.plot) || 'No description available.';
     const releaseDate = item.release_date || item.first_air_date || 'Unknown date';
     const mediaType = item.media_type === 'tv' ? 'TV Show' : 'Movie';
-    const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+    const tmdbRating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+
+    // Create ratings display with OMDB data if available
+    const ratingsHtml = createRatingsDisplay(tmdbRating, item.omdbData);
 
     return `
       <div class="card" data-id="${item.id}" data-type="${item.media_type}">
         <div class="card-image">
           <img src="${poster}" alt="${title}" loading="lazy">
-          <div class="rating">${rating}</div>
+          <div class="rating-tmdb">${tmdbRating}</div>
         </div>
         <div class="card-content">
           <h3 class="card-title">${title}</h3>
           <p class="card-type">${mediaType}</p>
+          ${ratingsHtml}
           <p class="card-overview">${overview.substring(0, 120)}${overview.length > 120 ? '...' : ''}</p>
           <p class="card-date"><strong>Release:</strong> ${releaseDate}</p>
           <div class="card-actions">
@@ -128,6 +320,36 @@ function displayResults(results) {
       </div>
     `;
   }).join('');
+}
+
+function createRatingsDisplay(tmdbRating, omdbData) {
+  if (!omdbData) {
+    return `<div class="ratings-single">
+      <span class="rating-item tmdb">TMDB: ${tmdbRating}</span>
+    </div>`;
+  }
+
+  const ratings = [];
+
+  if (tmdbRating !== 'N/A') {
+    ratings.push(`<span class="rating-item tmdb">TMDB: ${tmdbRating}</span>`);
+  }
+
+  if (omdbData.imdbRating) {
+    ratings.push(`<span class="rating-item imdb">IMDb: ${omdbData.imdbRating}</span>`);
+  }
+
+  if (omdbData.rottenTomatoesRating) {
+    ratings.push(`<span class="rating-item rt">RT: ${omdbData.rottenTomatoesRating}</span>`);
+  }
+
+  if (omdbData.metacriticRating) {
+    ratings.push(`<span class="rating-item mc">MC: ${omdbData.metacriticRating}</span>`);
+  }
+
+  return ratings.length > 0 ?
+    `<div class="ratings-multiple">${ratings.join('')}</div>` :
+    `<div class="ratings-single"><span class="rating-item tmdb">TMDB: ${tmdbRating}</span></div>`;
 }
 
 function addToWatchlist(item) {
