@@ -8,9 +8,12 @@ const TMDB_IMAGE_BASE_URL = AppConfig.get('TMDB_IMAGE_BASE_URL');
 const searchInput = document.getElementById('search-input');
 const resultsDiv = document.getElementById('results');
 const watchlistDiv = document.getElementById('watchlist');
+const trendingContentDiv = document.getElementById('trending-content');
 const searchViewBtn = document.getElementById('search-view-btn');
+const trendingViewBtn = document.getElementById('trending-view-btn');
 const watchlistViewBtn = document.getElementById('watchlist-view-btn');
 const searchView = document.getElementById('search-view');
+const trendingView = document.getElementById('trending-view');
 const watchlistView = document.getElementById('watchlist-view');
 
 // State Management
@@ -50,9 +53,36 @@ async function loadTrendingContent() {
       fetchTrendingTV()
     ]);
 
+    // Display in search view if search is empty
     displayTrendingContent(trendingMovies, trendingTV);
+
+    // Also store for trending view
+    window.cachedTrendingData = { movies: trendingMovies, tv: trendingTV };
+
+    return { movies: trendingMovies, tv: trendingTV };
   } catch (error) {
     console.error('Error loading trending content:', error);
+    return { movies: [], tv: [] };
+  }
+}
+
+async function loadTrendingContentForView() {
+  // Use cached data if available, otherwise fetch fresh
+  if (window.cachedTrendingData) {
+    displayTrendingContentForView(window.cachedTrendingData.movies, window.cachedTrendingData.tv);
+  } else {
+    try {
+      const [trendingMovies, trendingTV] = await Promise.all([
+        fetchTrendingMovies(),
+        fetchTrendingTV()
+      ]);
+
+      displayTrendingContentForView(trendingMovies, trendingTV);
+      window.cachedTrendingData = { movies: trendingMovies, tv: trendingTV };
+    } catch (error) {
+      console.error('Error loading trending content for view:', error);
+      trendingContentDiv.innerHTML = '<div class="error">Error loading trending content. Please try again.</div>';
+    }
   }
 }
 
@@ -93,30 +123,46 @@ async function fetchTrendingTV() {
 }
 
 function displayTrendingContent(movies, tvShows) {
-  // This will be displayed in the search view initially
+  // This will be displayed in the search view when search is empty
   if (searchInput.value.trim() === '') {
-    const trendingHtml = `
-      <div class="trending-section">
-        <h2 class="trending-title">🔥 Trending This Week</h2>
-
-        <div class="trending-category">
-          <h3 class="category-title">Movies</h3>
-          <div class="trending-grid">
-            ${movies.map(movie => createTrendingCard({...movie, media_type: 'movie'})).join('')}
-          </div>
-        </div>
-
-        <div class="trending-category">
-          <h3 class="category-title">TV Shows</h3>
-          <div class="trending-grid">
-            ${tvShows.map(show => createTrendingCard({...show, media_type: 'tv'})).join('')}
-          </div>
-        </div>
-      </div>
-    `;
-
+    const trendingHtml = createTrendingHTML(movies, tvShows);
     resultsDiv.innerHTML = trendingHtml;
   }
+}
+
+function loadTrendingContentForView() {
+  // Load trending content specifically for the trending view
+  loadTrendingContent().then(() => {
+    // The content will be displayed in displayTrendingContentForView
+  });
+}
+
+function displayTrendingContentForView(movies, tvShows) {
+  // Display trending content in the dedicated trending view
+  const trendingHtml = createTrendingHTML(movies, tvShows);
+  trendingContentDiv.innerHTML = trendingHtml;
+}
+
+function createTrendingHTML(movies, tvShows) {
+  return `
+    <div class="trending-section">
+      <h2 class="trending-title">🔥 Trending This Week</h2>
+
+      <div class="trending-category">
+        <h3 class="category-title">Movies</h3>
+        <div class="trending-grid">
+          ${movies.map(movie => createTrendingCard({...movie, media_type: 'movie'})).join('')}
+        </div>
+      </div>
+
+      <div class="trending-category">
+        <h3 class="category-title">TV Shows</h3>
+        <div class="trending-grid">
+          ${tvShows.map(show => createTrendingCard({...show, media_type: 'tv'})).join('')}
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function createTrendingCard(item) {
@@ -148,19 +194,50 @@ function createTrendingCard(item) {
 
 // View switchers
 searchViewBtn.addEventListener('click', () => {
-  searchView.style.display = 'block';
-  watchlistView.style.display = 'none';
-  searchViewBtn.classList.add('active');
-  watchlistViewBtn.classList.remove('active');
+  showView('search');
+});
+
+trendingViewBtn.addEventListener('click', () => {
+  showView('trending');
 });
 
 watchlistViewBtn.addEventListener('click', () => {
-  searchView.style.display = 'none';
-  watchlistView.style.display = 'block';
-  watchlistViewBtn.classList.add('active');
-  searchViewBtn.classList.remove('active');
-  displayWatchlist();
+  showView('watchlist');
 });
+
+function showView(viewName) {
+  // Hide all views
+  searchView.style.display = 'none';
+  trendingView.style.display = 'none';
+  watchlistView.style.display = 'none';
+
+  // Remove active class from all buttons
+  searchViewBtn.classList.remove('active');
+  trendingViewBtn.classList.remove('active');
+  watchlistViewBtn.classList.remove('active');
+
+  // Show selected view and activate button
+  switch(viewName) {
+    case 'search':
+      searchView.style.display = 'block';
+      searchViewBtn.classList.add('active');
+      // Load trending content in search view if search is empty
+      if (!searchInput.value.trim()) {
+        loadTrendingContent();
+      }
+      break;
+    case 'trending':
+      trendingView.style.display = 'block';
+      trendingViewBtn.classList.add('active');
+      loadTrendingContentForView();
+      break;
+    case 'watchlist':
+      watchlistView.style.display = 'block';
+      watchlistViewBtn.classList.add('active');
+      displayWatchlist();
+      break;
+  }
+}
 
 // Debounced search
 searchInput.addEventListener('input', () => {
