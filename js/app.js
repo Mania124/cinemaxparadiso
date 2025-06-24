@@ -275,8 +275,8 @@ function displayMoviesByGenre(genreMovies) {
     .map(genreData => `
       <div class="genre-section">
         <h2 class="genre-title">${genreData.genre}</h2>
-        <div class="genre-grid">
-          ${genreData.movies.map(movie => createGenreMovieCard(movie)).join('')}
+        <div class="genre-horizontal-scroll">
+          ${genreData.movies.slice(0, 15).map(movie => createGenreMovieCard(movie)).join('')}
         </div>
       </div>
     `).join('');
@@ -290,6 +290,8 @@ function displayMoviesByGenre(genreMovies) {
 
   resultsDiv.innerHTML = fullHtml;
 }
+
+
 
 function createGenreMovieCard(movie) {
   const title = movie.title || 'No Title';
