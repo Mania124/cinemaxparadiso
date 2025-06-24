@@ -39,7 +39,7 @@ const SearchView = () => {
         />
       </div>
 
-      <div id="results">
+      <div id="results" className={showGenreView ? 'genre-view' : ''}>
         {loading && <div className="loading">Loading...</div>}
         {error && <div className="error">Error: {error}</div>}
         
