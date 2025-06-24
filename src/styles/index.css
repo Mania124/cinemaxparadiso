@@ -80,8 +80,8 @@ h1 {
 
 /* Override grid for genre-based content */
 #results,.movies-by-genre {
-  display: grid;
-  /* grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); */
+  display: flex;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   margin-top: 20px;
   padding: 0 20px;
@@ -517,8 +517,8 @@ h1 {
 }
 
 .genre-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 15px;
   padding: 0 20px 20px 20px;
   width: 100%;
@@ -534,7 +534,9 @@ h1 {
   box-shadow: 0 6px 20px rgba(0,0,0,0.1);
   transition: all 0.3s ease;
   cursor: pointer;
-  width: 100%;
+  flex: 1 1 280px;
+  min-width: 280px;
+  max-width: 350px;
   height: 400px;
   display: flex;
   flex-direction: column;
@@ -702,12 +704,14 @@ h1 {
   }
 
   .genre-grid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 12px;
     padding: 0 15px 15px 15px;
   }
 
   .genre-movie-card {
+    flex: 1 1 200px;
+    min-width: 200px;
+    max-width: 280px;
     height: 350px;
   }
 
