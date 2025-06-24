@@ -194,6 +194,7 @@ function createTrendingCard(item) {
 
 // Genre-based Movie Loading Functions
 async function loadMoviesByGenre() {
+  console.log('Loading movies by genre...');
   resultsDiv.innerHTML = '<div class="loading">Loading latest movies...</div>';
 
   try {
