@@ -204,6 +204,110 @@ class MovieService {
 
     return results.filter(category => category.items.length > 0)
   }
+
+  // Get detailed movie information
+  async getMovieDetails(movieId, mediaType = 'movie') {
+    if (!this.tmdbApiKey) {
+      throw new Error('TMDB API key not configured')
+    }
+
+    const endpoint = mediaType === 'tv' ? 'tv' : 'movie'
+    const response = await fetch(
+      `${AppConfig.TMDB_BASE_URL}/${endpoint}/${movieId}?api_key=${this.tmdbApiKey}`
+    )
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return await response.json()
+  }
+
+  // Get movie trailer from YouTube
+  async getMovieTrailer(movieId, mediaType = 'movie') {
+    if (!this.tmdbApiKey) {
+      throw new Error('TMDB API key not configured')
+    }
+
+    const endpoint = mediaType === 'tv' ? 'tv' : 'movie'
+    const response = await fetch(
+      `${AppConfig.TMDB_BASE_URL}/${endpoint}/${movieId}/videos?api_key=${this.tmdbApiKey}`
+    )
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    // Find YouTube trailer
+    const trailer = data.results?.find(video =>
+      video.site === 'YouTube' &&
+      (video.type === 'Trailer' || video.type === 'Teaser')
+    )
+
+    return trailer?.key || null
+  }
+
+  // Get streaming providers
+  async getStreamingProviders(movieId, mediaType = 'movie') {
+    if (!this.tmdbApiKey) {
+      throw new Error('TMDB API key not configured')
+    }
+
+    try {
+      const endpoint = mediaType === 'tv' ? 'tv' : 'movie'
+      const response = await fetch(
+        `${AppConfig.TMDB_BASE_URL}/${endpoint}/${movieId}/watch/providers?api_key=${this.tmdbApiKey}`
+      )
+
+      if (!response.ok) {
+        return [] // Return empty array if providers not available
+      }
+
+      const data = await response.json()
+      const usProviders = data.results?.US
+
+      const providers = []
+
+      // Add streaming providers (flatrate)
+      if (usProviders?.flatrate) {
+        usProviders.flatrate.forEach(provider => {
+          providers.push({
+            name: provider.provider_name,
+            logo: `${AppConfig.TMDB_IMAGE_BASE_URL}/w92${provider.logo_path}`,
+            link: usProviders.link || '#'
+          })
+        })
+      }
+
+      // Add rent/buy providers
+      if (usProviders?.rent) {
+        usProviders.rent.forEach(provider => {
+          providers.push({
+            name: `${provider.provider_name} (Rent)`,
+            logo: `${AppConfig.TMDB_IMAGE_BASE_URL}/w92${provider.logo_path}`,
+            link: usProviders.link || '#'
+          })
+        })
+      }
+
+      if (usProviders?.buy) {
+        usProviders.buy.forEach(provider => {
+          providers.push({
+            name: `${provider.provider_name} (Buy)`,
+            logo: `${AppConfig.TMDB_IMAGE_BASE_URL}/w92${provider.logo_path}`,
+            link: usProviders.link || '#'
+          })
+        })
+      }
+
+      return providers
+    } catch (error) {
+      console.error('Error fetching streaming providers:', error)
+      return []
+    }
+  }
 }
 
 export const movieService = new MovieService()

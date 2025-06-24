@@ -4,7 +4,7 @@ import { useMoviesByGenre } from '../hooks/useMoviesByGenre'
 import MovieGrid from './MovieGrid'
 import GenreSection from './GenreSection'
 
-const SearchView = ({ showSearchInput, onSearchInputToggle, contentType }) => {
+const SearchView = ({ showSearchInput, onSearchInputToggle, contentType, onMovieSelect }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const { movies: searchResults, loading: searchLoading, error: searchError, searchMovies } = useMovieSearch()
   const { genreMovies, loading: genreLoading, error: genreError } = useMoviesByGenre(contentType)
@@ -65,13 +65,14 @@ const SearchView = ({ showSearchInput, onSearchInputToggle, contentType }) => {
                 key={genreData.genre}
                 genre={genreData.genre}
                 movies={genreData.movies}
+                onMovieSelect={onMovieSelect}
               />
             ))}
           </div>
         )}
 
         {!showGenreView && searchResults && !loading && !error && (
-          <MovieGrid movies={searchResults} />
+          <MovieGrid movies={searchResults} onMovieSelect={onMovieSelect} />
         )}
 
         {!loading && !error && (

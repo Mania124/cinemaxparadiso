@@ -4,6 +4,7 @@ import Navigation from './components/Navigation'
 import SearchView from './components/SearchView'
 import TrendingView from './components/TrendingView'
 import WatchlistView from './components/WatchlistView'
+import MovieDetails from './components/MovieDetails'
 import { AppConfig } from './services/config'
 import './styles/App.css'
 
@@ -12,6 +13,7 @@ function App() {
   const [isConfigured, setIsConfigured] = useState(false)
   const [showSearchInput, setShowSearchInput] = useState(false)
   const [contentType, setContentType] = useState('all')
+  const [selectedMovie, setSelectedMovie] = useState(null)
 
   useEffect(() => {
     // Check if API keys are configured
@@ -46,16 +48,24 @@ function App() {
     setContentType(type)
   }
 
+  const handleMovieSelect = (movie) => {
+    setSelectedMovie(movie)
+  }
+
+  const handleCloseMovieDetails = () => {
+    setSelectedMovie(null)
+  }
+
   const renderCurrentView = () => {
     switch (currentView) {
       case 'search':
-        return <SearchView showSearchInput={showSearchInput} onSearchInputToggle={setShowSearchInput} contentType={contentType} />
+        return <SearchView showSearchInput={showSearchInput} onSearchInputToggle={setShowSearchInput} contentType={contentType} onMovieSelect={handleMovieSelect} />
       case 'trending':
-        return <TrendingView contentType={contentType} />
+        return <TrendingView contentType={contentType} onMovieSelect={handleMovieSelect} />
       case 'watchlist':
-        return <WatchlistView contentType={contentType} />
+        return <WatchlistView contentType={contentType} onMovieSelect={handleMovieSelect} />
       default:
-        return <SearchView showSearchInput={showSearchInput} onSearchInputToggle={setShowSearchInput} contentType={contentType} />
+        return <SearchView showSearchInput={showSearchInput} onSearchInputToggle={setShowSearchInput} contentType={contentType} onMovieSelect={handleMovieSelect} />
     }
   }
 
@@ -71,6 +81,13 @@ function App() {
       <main className="main-content">
         {renderCurrentView()}
       </main>
+
+      {selectedMovie && (
+        <MovieDetails
+          movie={selectedMovie}
+          onClose={handleCloseMovieDetails}
+        />
+      )}
     </div>
   )
 }

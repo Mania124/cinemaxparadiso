@@ -1,7 +1,7 @@
 import React from 'react'
 import MovieCard from './MovieCard'
 
-const MovieGrid = ({ movies }) => {
+const MovieGrid = ({ movies, onMovieSelect }) => {
   if (!movies || movies.length === 0) return null
 
   return (
@@ -11,6 +11,7 @@ const MovieGrid = ({ movies }) => {
           key={`${movie.id}-${movie.media_type}`}
           movie={movie}
           variant="default"
+          onMovieSelect={onMovieSelect}
         />
       ))}
     </div>
