@@ -9,8 +9,8 @@ const MovieCard = ({ movie, variant = 'default' }) => {
 
   const title = movie.title || movie.name || 'No Title'
   const poster = movie.poster_path
-    ? `${AppConfig.TMDB_IMAGE_BASE_URL}/w300${movie.poster_path}`
-    : 'https://via.placeholder.com/300x450?text=No+Image'
+    ? `${AppConfig.TMDB_IMAGE_BASE_URL}/w342${movie.poster_path}`
+    : 'https://via.placeholder.com/342x513?text=No+Image'
   const overview = movie.overview || 'No description available.'
   const releaseDate = movie.release_date || movie.first_air_date || 'Unknown date'
   const mediaType = movie.media_type === 'tv' ? 'TV Show' : 'Movie'
