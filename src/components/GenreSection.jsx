@@ -8,7 +8,7 @@ const GenreSection = ({ genre, movies }) => {
     <div className="genre-section">
       <h2 className="genre-title">{genre}</h2>
       <div className="genre-horizontal-scroll">
-        {movies.slice(0, 15).map(movie => (
+        {movies.map(movie => (
           <MovieCard
             key={movie.id}
             movie={movie}

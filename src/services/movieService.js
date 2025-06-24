@@ -50,7 +50,7 @@ class MovieService {
         const movies = await this.fetchMoviesByGenre(genre.id)
         return {
           genre: genre.name,
-          movies: movies.slice(0, 15) // First 15 movies
+          movies: movies // Already limited to 15 in fetchMoviesByGenre
         }
       })
     )
@@ -66,12 +66,13 @@ class MovieService {
 
     // Get today's date in YYYY-MM-DD format for filtering
     const today = new Date().toISOString().split('T')[0]
-    
-    // Fetch multiple pages to ensure we get enough movies
-    const pages = [1, 2] // Fetch first 2 pages (40 movies total)
+
+    // Fetch multiple pages to ensure we get exactly 15 movies
     const allMovies = []
-    
-    for (const page of pages) {
+    let page = 1
+    const maxPages = 5 // Limit to prevent infinite loops
+
+    while (allMovies.length < 15 && page <= maxPages) {
       const response = await fetch(
         `${AppConfig.TMDB_BASE_URL}/discover/movie?api_key=${this.tmdbApiKey}&with_genres=${genreId}&sort_by=release_date.desc&release_date.lte=${today}&page=${page}`
       )
@@ -81,13 +82,18 @@ class MovieService {
       }
 
       const data = await response.json()
+
+      // If no more results, break
+      if (!data.results || data.results.length === 0) {
+        break
+      }
+
       allMovies.push(...data.results)
-      
-      // If we have enough movies, break early
-      if (allMovies.length >= 15) break
+      page++
     }
-    
-    return allMovies.map(movie => ({
+
+    // Return exactly 15 movies (or fewer if not available)
+    return allMovies.slice(0, 15).map(movie => ({
       ...movie,
       media_type: 'movie' // Add media_type for consistency
     }))
