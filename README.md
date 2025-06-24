@@ -1,4 +1,4 @@
-# Cinema Paradise 🎬
+# Cinema Paradiso 🎬
 
 A modern movie and TV show discovery platform built with React and Vite, featuring trending content, search functionality, and personal watchlists.
 
@@ -23,12 +23,14 @@ A modern movie and TV show discovery platform built with React and Vite, featuri
 ## Setup
 
 1. **Clone the repository**
+
    ```bash
-   git clone https://github.com/yourusername/cinemaxparadiso.git
+   git clone https://github.com/Mania124/cinemaxparadiso.git
    cd cinemaxparadiso
    ```
 
 2. **Install Dependencies**
+
    ```bash
    npm install
    ```
@@ -38,22 +40,26 @@ A modern movie and TV show discovery platform built with React and Vite, featuri
    - **OMDB API Key** (Optional): Get from [OMDB API](http://www.omdbapi.com/apikey.aspx)
 
 4. **Configure Environment**
+
    ```bash
    cp .env.example .env
    ```
+
    Edit `.env` and add your API keys:
-   ```
+
+   ```bash
    VITE_TMDB_API_KEY=your_tmdb_api_key_here
    VITE_OMDB_API_KEY=your_omdb_api_key_here
    ```
 
 5. **Run the Development Server**
+
    ```bash
    npm run dev
    ```
 
 6. **Open in Browser**
-   Navigate to `http://localhost:3000`
+   Navigate to `http://localhost:5173`
 
 ## Build for Production
 
@@ -64,8 +70,8 @@ npm run preview
 
 ## Project Structure
 
-```
-Cinema Paradise/
+```bash
+Cinema Paradiso/
 │
 ├── index.html              # Main HTML template
 ├── src/

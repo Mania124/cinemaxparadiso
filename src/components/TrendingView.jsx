@@ -2,7 +2,7 @@ import React from 'react'
 import { useTrendingContent } from '../hooks/useTrendingContent'
 import TrendingGrid from './TrendingGrid'
 
-const TrendingView = () => {
+const TrendingView = ({ onMovieSelect }) => {
   const { trendingData, loading, error } = useTrendingContent()
 
   if (loading) return <div className="loading">Loading trending content...</div>
@@ -15,7 +15,7 @@ const TrendingView = () => {
         {trendingData && trendingData.map(category => (
           <div key={category.title} className="trending-category">
             <h2 className="category-title">{category.title}</h2>
-            <TrendingGrid movies={category.items} />
+            <TrendingGrid movies={category.items} onMovieSelect={onMovieSelect} />
           </div>
         ))}
       </div>

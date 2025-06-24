@@ -1,7 +1,7 @@
 import React from 'react'
 import MovieCard from './MovieCard'
 
-const GenreSection = ({ genre, movies }) => {
+const GenreSection = ({ genre, movies, onMovieSelect }) => {
   if (!movies || movies.length === 0) return null
 
   return (
@@ -13,6 +13,7 @@ const GenreSection = ({ genre, movies }) => {
             key={movie.id}
             movie={movie}
             variant="genre"
+            onMovieSelect={onMovieSelect}
           />
         ))}
       </div>

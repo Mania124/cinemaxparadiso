@@ -2,7 +2,7 @@ import React from 'react'
 import { useWatchlist } from '../hooks/useWatchlist'
 import WatchlistGrid from './WatchlistGrid'
 
-const WatchlistView = () => {
+const WatchlistView = ({ onMovieSelect }) => {
   const { watchlist, loading, error, removeFromWatchlist, toggleWatched } = useWatchlist()
 
   if (loading) return <div className="loading">Loading watchlist...</div>
@@ -24,6 +24,7 @@ const WatchlistView = () => {
         movies={watchlist}
         onRemove={removeFromWatchlist}
         onToggleWatched={toggleWatched}
+        onMovieSelect={onMovieSelect}
       />
     </div>
   )

@@ -4,10 +4,10 @@ import { useMoviesByGenre } from '../hooks/useMoviesByGenre'
 import MovieGrid from './MovieGrid'
 import GenreSection from './GenreSection'
 
-const SearchView = () => {
+const SearchView = ({ showSearchInput, onSearchInputToggle, contentType, onMovieSelect }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const { movies: searchResults, loading: searchLoading, error: searchError, searchMovies } = useMovieSearch()
-  const { genreMovies, loading: genreLoading, error: genreError } = useMoviesByGenre()
+  const { genreMovies, loading: genreLoading, error: genreError } = useMoviesByGenre(contentType)
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -19,6 +19,13 @@ const SearchView = () => {
     return () => clearTimeout(timeoutId)
   }, [searchQuery, searchMovies])
 
+  useEffect(() => {
+    // Clear search when input is hidden
+    if (!showSearchInput) {
+      setSearchQuery('')
+    }
+  }, [showSearchInput])
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value)
   }
@@ -29,35 +36,43 @@ const SearchView = () => {
 
   return (
     <div className="search-view">
-      <div className="search-input-container">
-        <input
-          type="text"
-          id="search-input"
-          placeholder="Search for movies or TV shows..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-      </div>
+      {showSearchInput && (
+        <div className="search-input-container">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search for movies or TV shows..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            autoFocus
+          />
+        </div>
+      )}
 
-      <div id="results">
+      <div id="results" className={showGenreView ? 'genre-view' : ''}>
         {loading && <div className="loading">Loading...</div>}
         {error && <div className="error">Error: {error}</div>}
         
         {showGenreView && genreMovies && !loading && !error && (
           <div className="movies-by-genre">
-            <h1 className="page-title">🎬 Latest Movies by Genre</h1>
+            <h1 className="page-title">
+              {contentType === 'movie' && '🎥 Latest Movies by Genre'}
+              {contentType === 'tv' && '📺 Latest TV & Series by Genre'}
+              {contentType === 'all' && '🎬 Latest Movies & TV by Genre'}
+            </h1>
             {genreMovies.map(genreData => (
               <GenreSection
                 key={genreData.genre}
                 genre={genreData.genre}
                 movies={genreData.movies}
+                onMovieSelect={onMovieSelect}
               />
             ))}
           </div>
         )}
 
         {!showGenreView && searchResults && !loading && !error && (
-          <MovieGrid movies={searchResults} />
+          <MovieGrid movies={searchResults} onMovieSelect={onMovieSelect} />
         )}
 
         {!loading && !error && (

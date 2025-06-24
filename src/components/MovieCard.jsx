@@ -3,7 +3,7 @@ import { AppConfig } from '../services/config'
 import { useWatchlist } from '../hooks/useWatchlist'
 import { useNotification } from '../hooks/useNotification'
 
-const MovieCard = ({ movie, variant = 'default' }) => {
+const MovieCard = ({ movie, variant = 'default', onMovieSelect }) => {
   const { addToWatchlist } = useWatchlist()
   const { showNotification } = useNotification()
 
@@ -16,20 +16,32 @@ const MovieCard = ({ movie, variant = 'default' }) => {
   const mediaType = movie.media_type === 'tv' ? 'TV Show' : 'Movie'
   const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'
 
-  const handleAddToWatchlist = () => {
+  const handleAddToWatchlist = (e) => {
+    e.stopPropagation()
     addToWatchlist(movie)
     showNotification('Added to watchlist!', 'success')
   }
 
-  const handleViewDetails = () => {
-    showNotification('Detailed view coming soon!', 'info')
+  const handleViewDetails = (e) => {
+    e.stopPropagation()
+    if (onMovieSelect) {
+      onMovieSelect(movie)
+    } else {
+      showNotification('Detailed view coming soon!', 'info')
+    }
+  }
+
+  const handleCardClick = () => {
+    if (onMovieSelect) {
+      onMovieSelect(movie)
+    }
   }
 
   if (variant === 'genre') {
     const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : 'TBA'
     
     return (
-      <div className="genre-movie-card" data-id={movie.id} data-type="movie">
+      <div className="genre-movie-card" data-id={movie.id} data-type="movie" onClick={handleCardClick}>
         <div className="genre-movie-image">
           <img src={poster} alt={title} loading="lazy" />
           <div className="genre-movie-rating">{rating}</div>
@@ -39,10 +51,10 @@ const MovieCard = ({ movie, variant = 'default' }) => {
           <h4 className="genre-movie-title">{title}</h4>
           <div className="genre-movie-actions">
             <button className="btn-small btn-primary" onClick={handleAddToWatchlist}>
-              + Watchlist
+              + List
             </button>
             <button className="btn-small btn-secondary" onClick={handleViewDetails}>
-              Details
+              Info
             </button>
           </div>
         </div>
@@ -51,7 +63,7 @@ const MovieCard = ({ movie, variant = 'default' }) => {
   }
 
   return (
-    <div className="card" data-id={movie.id} data-type={movie.media_type}>
+    <div className="card" data-id={movie.id} data-type={movie.media_type} onClick={handleCardClick}>
       <div className="card-image">
         <img src={poster} alt={title} loading="lazy" />
         <div className="rating-tmdb">{rating}</div>
