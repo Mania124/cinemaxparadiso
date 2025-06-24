@@ -1,0 +1,39 @@
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.main-content {
+  padding: 20px 0;
+}
+
+.config-warning {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  color: white;
+  padding: 40px;
+}
+
+.config-warning h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.config-warning p {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  max-width: 600px;
+}
+
+.config-warning code {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  display: inline-block;
+  margin-top: 10px;
+}

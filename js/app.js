@@ -251,16 +251,30 @@ async function fetchMovieGenres() {
 
 async function fetchMoviesByGenre(genreId) {
   try {
-    const response = await fetch(
-      `${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=${genreId}&sort_by=release_date.desc&page=1`
-    );
+    // Get today's date in YYYY-MM-DD format for filtering
+    const today = new Date().toISOString().split('T')[0];
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // Fetch multiple pages to ensure we get enough movies
+    const pages = [1, 2]; // Fetch first 2 pages (40 movies total)
+    const allMovies = [];
+
+    for (const page of pages) {
+      const response = await fetch(
+        `${TMDB_BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&with_genres=${genreId}&sort_by=release_date.desc&release_date.lte=${today}&page=${page}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      allMovies.push(...data.results);
+
+      // If we have enough movies, break early
+      if (allMovies.length >= 15) break;
     }
 
-    const data = await response.json();
-    return data.results.map(movie => ({
+    return allMovies.map(movie => ({
       ...movie,
       media_type: 'movie' // Add media_type for consistency
     }));
