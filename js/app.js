@@ -170,7 +170,8 @@ searchInput.addEventListener('input', () => {
     if (query) {
       searchMovies(query);
     } else {
-      resultsDiv.innerHTML = '';
+      // Show trending content when search is empty
+      loadTrendingContent();
     }
   }, 500);
 });

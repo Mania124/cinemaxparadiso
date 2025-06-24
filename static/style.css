@@ -316,6 +316,135 @@ h1 {
   }
 }
 
+/* Trending Content Styles */
+.trending-section {
+  margin: 20px 0;
+}
+
+.trending-title {
+  color: white;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.trending-category {
+  margin-bottom: 40px;
+}
+
+.category-title {
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.trending-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.trending-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.trending-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.trending-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.trending-card img {
+  width: 100%;
+  height: 270px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.trending-card:hover img {
+  transform: scale(1.05);
+}
+
+.trending-rating {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.8);
+  color: #FFD700;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.trending-popularity {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255,255,255,0.9);
+  color: #333;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.trending-content {
+  padding: 12px;
+}
+
+.trending-content .trending-title {
+  font-size: 0.9rem;
+  margin: 0 0 10px 0;
+  color: #333;
+  text-align: left;
+  text-shadow: none;
+  line-height: 1.3;
+  height: 2.6em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.trending-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 15px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-small.btn-primary {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+}
+
+.btn-small.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   body {
@@ -329,6 +458,15 @@ h1 {
   #results, #watchlist {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 15px;
+  }
+
+  .trending-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .trending-card img {
+    height: 220px;
   }
 
   .card-actions {
