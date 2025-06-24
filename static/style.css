@@ -111,7 +111,7 @@ h1 {
   transform: scale(1.05);
 }
 
-.rating {
+.rating-tmdb {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -121,6 +121,41 @@ h1 {
   border-radius: 15px;
   font-weight: bold;
   font-size: 14px;
+}
+
+/* Multiple Ratings Display */
+.ratings-multiple, .ratings-single {
+  margin: 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rating-item {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.rating-item.tmdb {
+  background: linear-gradient(45deg, #01b4e4, #90cea1);
+}
+
+.rating-item.imdb {
+  background: #f5c518;
+  color: #000;
+}
+
+.rating-item.rt {
+  background: #fa320a;
+}
+
+.rating-item.mc {
+  background: #ffcc33;
+  color: #000;
 }
 
 .watched-badge {
