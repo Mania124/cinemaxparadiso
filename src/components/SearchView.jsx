@@ -4,10 +4,10 @@ import { useMoviesByGenre } from '../hooks/useMoviesByGenre'
 import MovieGrid from './MovieGrid'
 import GenreSection from './GenreSection'
 
-const SearchView = ({ showSearchInput, onSearchInputToggle }) => {
+const SearchView = ({ showSearchInput, onSearchInputToggle, contentType }) => {
   const [searchQuery, setSearchQuery] = useState('')
   const { movies: searchResults, loading: searchLoading, error: searchError, searchMovies } = useMovieSearch()
-  const { genreMovies, loading: genreLoading, error: genreError } = useMoviesByGenre()
+  const { genreMovies, loading: genreLoading, error: genreError } = useMoviesByGenre(contentType)
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -55,7 +55,11 @@ const SearchView = ({ showSearchInput, onSearchInputToggle }) => {
         
         {showGenreView && genreMovies && !loading && !error && (
           <div className="movies-by-genre">
-            <h1 className="page-title">🎬 Latest Movies by Genre</h1>
+            <h1 className="page-title">
+              {contentType === 'movie' && '🎥 Latest Movies by Genre'}
+              {contentType === 'tv' && '📺 Latest TV & Series by Genre'}
+              {contentType === 'all' && '🎬 Latest Movies & TV by Genre'}
+            </h1>
             {genreMovies.map(genreData => (
               <GenreSection
                 key={genreData.genre}

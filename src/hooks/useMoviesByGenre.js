@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { movieService } from '../services/movieService'
 
-export const useMoviesByGenre = () => {
+export const useMoviesByGenre = (contentType = 'all') => {
   const [genreMovies, setGenreMovies] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -12,7 +12,7 @@ export const useMoviesByGenre = () => {
       setError(null)
 
       try {
-        const results = await movieService.getMoviesByGenre()
+        const results = await movieService.getContentByGenre(contentType)
         setGenreMovies(results)
       } catch (err) {
         setError(err.message)
@@ -23,7 +23,7 @@ export const useMoviesByGenre = () => {
     }
 
     loadMoviesByGenre()
-  }, [])
+  }, [contentType])
 
   return {
     genreMovies,

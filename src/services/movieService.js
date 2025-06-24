@@ -24,8 +24,8 @@ class MovieService {
     return data.results || []
   }
 
-  // Get movies by genre
-  async getMoviesByGenre() {
+  // Get content by genre (movies, TV, or both)
+  async getContentByGenre(contentType = 'all') {
     if (!this.tmdbApiKey) {
       throw new Error('TMDB API key not configured')
     }
@@ -44,18 +44,41 @@ class MovieService {
       { id: 53, name: 'Thriller' }
     ]
 
-    // Fetch movies for each genre
-    const genreMovies = await Promise.all(
+    // Fetch content for each genre based on type
+    const genreContent = await Promise.all(
       popularGenres.map(async (genre) => {
-        const movies = await this.fetchMoviesByGenre(genre.id)
+        let content = []
+
+        if (contentType === 'all' || contentType === 'movie') {
+          const movies = await this.fetchMoviesByGenre(genre.id)
+          content.push(...movies)
+        }
+
+        if (contentType === 'all' || contentType === 'tv') {
+          const tvShows = await this.fetchTVByGenre(genre.id)
+          content.push(...tvShows)
+        }
+
+        // Sort by release/air date (newest first) and limit to 15
+        content.sort((a, b) => {
+          const dateA = new Date(a.release_date || a.first_air_date || '1900-01-01')
+          const dateB = new Date(b.release_date || b.first_air_date || '1900-01-01')
+          return dateB - dateA
+        })
+
         return {
           genre: genre.name,
-          movies: movies // Already limited to 15 in fetchMoviesByGenre
+          movies: content.slice(0, 15)
         }
       })
     )
 
-    return genreMovies.filter(genreData => genreData.movies.length > 0)
+    return genreContent.filter(genreData => genreData.movies.length > 0)
+  }
+
+  // Backward compatibility
+  async getMoviesByGenre() {
+    return this.getContentByGenre('movie')
   }
 
   // Fetch movies for a specific genre
@@ -67,12 +90,12 @@ class MovieService {
     // Get today's date in YYYY-MM-DD format for filtering
     const today = new Date().toISOString().split('T')[0]
 
-    // Fetch multiple pages to ensure we get exactly 15 movies
+    // Fetch multiple pages to ensure we get movies
     const allMovies = []
     let page = 1
-    const maxPages = 5 // Limit to prevent infinite loops
+    const maxPages = 3 // Limit to prevent infinite loops
 
-    while (allMovies.length < 15 && page <= maxPages) {
+    while (allMovies.length < 10 && page <= maxPages) {
       const response = await fetch(
         `${AppConfig.TMDB_BASE_URL}/discover/movie?api_key=${this.tmdbApiKey}&with_genres=${genreId}&sort_by=release_date.desc&release_date.lte=${today}&page=${page}`
       )
@@ -92,10 +115,51 @@ class MovieService {
       page++
     }
 
-    // Return exactly 15 movies (or fewer if not available)
-    return allMovies.slice(0, 15).map(movie => ({
+    // Return movies with media_type
+    return allMovies.slice(0, 10).map(movie => ({
       ...movie,
       media_type: 'movie' // Add media_type for consistency
+    }))
+  }
+
+  // Fetch TV shows for a specific genre
+  async fetchTVByGenre(genreId) {
+    if (!this.tmdbApiKey) {
+      throw new Error('TMDB API key not configured')
+    }
+
+    // Get today's date in YYYY-MM-DD format for filtering
+    const today = new Date().toISOString().split('T')[0]
+
+    // Fetch multiple pages to ensure we get TV shows
+    const allTVShows = []
+    let page = 1
+    const maxPages = 3 // Limit to prevent infinite loops
+
+    while (allTVShows.length < 10 && page <= maxPages) {
+      const response = await fetch(
+        `${AppConfig.TMDB_BASE_URL}/discover/tv?api_key=${this.tmdbApiKey}&with_genres=${genreId}&sort_by=first_air_date.desc&first_air_date.lte=${today}&page=${page}`
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      // If no more results, break
+      if (!data.results || data.results.length === 0) {
+        break
+      }
+
+      allTVShows.push(...data.results)
+      page++
+    }
+
+    // Return TV shows with media_type
+    return allTVShows.slice(0, 10).map(tvShow => ({
+      ...tvShow,
+      media_type: 'tv' // Add media_type for consistency
     }))
   }
 

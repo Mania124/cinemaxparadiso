@@ -11,6 +11,7 @@ function App() {
   const [currentView, setCurrentView] = useState('search')
   const [isConfigured, setIsConfigured] = useState(false)
   const [showSearchInput, setShowSearchInput] = useState(false)
+  const [contentType, setContentType] = useState('all')
 
   useEffect(() => {
     // Check if API keys are configured
@@ -41,23 +42,32 @@ function App() {
     }
   }
 
+  const handleContentTypeChange = (type) => {
+    setContentType(type)
+  }
+
   const renderCurrentView = () => {
     switch (currentView) {
       case 'search':
-        return <SearchView showSearchInput={showSearchInput} onSearchInputToggle={setShowSearchInput} />
+        return <SearchView showSearchInput={showSearchInput} onSearchInputToggle={setShowSearchInput} contentType={contentType} />
       case 'trending':
-        return <TrendingView />
+        return <TrendingView contentType={contentType} />
       case 'watchlist':
-        return <WatchlistView />
+        return <WatchlistView contentType={contentType} />
       default:
-        return <SearchView showSearchInput={showSearchInput} onSearchInputToggle={setShowSearchInput} />
+        return <SearchView showSearchInput={showSearchInput} onSearchInputToggle={setShowSearchInput} contentType={contentType} />
     }
   }
 
   return (
     <div className="app">
       <Header />
-      <Navigation currentView={currentView} onViewChange={handleViewChange} />
+      <Navigation
+        currentView={currentView}
+        onViewChange={handleViewChange}
+        contentType={contentType}
+        onContentTypeChange={handleContentTypeChange}
+      />
       <main className="main-content">
         {renderCurrentView()}
       </main>
