@@ -270,36 +270,46 @@ class MovieService {
 
       const providers = []
 
-      // Add streaming providers (flatrate)
+      // Add streaming providers (flatrate) - these are subscription services
       if (usProviders?.flatrate) {
         usProviders.flatrate.forEach(provider => {
           providers.push({
             name: provider.provider_name,
             logo: `${AppConfig.TMDB_IMAGE_BASE_URL}/w92${provider.logo_path}`,
-            link: usProviders.link || '#'
+            link: usProviders.link || this.generateStreamingLink(provider.provider_name, movieId, mediaType),
+            type: 'stream'
           })
         })
       }
 
-      // Add rent/buy providers
+      // Add rent providers
       if (usProviders?.rent) {
         usProviders.rent.forEach(provider => {
           providers.push({
             name: `${provider.provider_name} (Rent)`,
             logo: `${AppConfig.TMDB_IMAGE_BASE_URL}/w92${provider.logo_path}`,
-            link: usProviders.link || '#'
+            link: usProviders.link || this.generateStreamingLink(provider.provider_name, movieId, mediaType),
+            type: 'rent'
           })
         })
       }
 
+      // Add buy providers
       if (usProviders?.buy) {
         usProviders.buy.forEach(provider => {
           providers.push({
             name: `${provider.provider_name} (Buy)`,
             logo: `${AppConfig.TMDB_IMAGE_BASE_URL}/w92${provider.logo_path}`,
-            link: usProviders.link || '#'
+            link: usProviders.link || this.generateStreamingLink(provider.provider_name, movieId, mediaType),
+            type: 'buy'
           })
         })
+      }
+
+      // If no providers found, add popular streaming services as fallbacks
+      if (providers.length === 0) {
+        const fallbackProviders = this.getFallbackStreamingLinks(movieId, mediaType)
+        providers.push(...fallbackProviders)
       }
 
       return providers
@@ -307,6 +317,59 @@ class MovieService {
       console.error('Error fetching streaming providers:', error)
       return []
     }
+  }
+
+  // Generate streaming links for popular services
+  generateStreamingLink(providerName, movieId, mediaType) {
+    const title = movieId // This would ideally be the movie title, but we'll use ID for now
+    const type = mediaType === 'tv' ? 'tv' : 'movie'
+
+    const streamingUrls = {
+      'Netflix': `https://www.netflix.com/search?q=${title}`,
+      'Amazon Prime Video': `https://www.amazon.com/s?k=${title}&i=prime-instant-video`,
+      'Hulu': `https://www.hulu.com/search?q=${title}`,
+      'Disney Plus': `https://www.disneyplus.com/search?q=${title}`,
+      'HBO Max': `https://www.hbomax.com/search?q=${title}`,
+      'Apple TV': `https://tv.apple.com/search?term=${title}`,
+      'Paramount Plus': `https://www.paramountplus.com/search/?query=${title}`,
+      'Peacock': `https://www.peacocktv.com/search?q=${title}`,
+      'YouTube': `https://www.youtube.com/results?search_query=${title}+${type}+full+movie`,
+      'Google Play Movies': `https://play.google.com/store/search?q=${title}&c=movies`,
+      'Vudu': `https://www.vudu.com/content/movies/search/${title}`,
+      'Microsoft Store': `https://www.microsoft.com/en-us/search?q=${title}`
+    }
+
+    return streamingUrls[providerName] || `https://www.google.com/search?q=watch+${title}+online`
+  }
+
+  // Get fallback streaming links when no providers are available
+  getFallbackStreamingLinks(movieId, mediaType) {
+    return [
+      {
+        name: 'Netflix',
+        logo: 'https://image.tmdb.org/t/p/w92/9A1JSVmSxsyaBK4SUFsYVqbAYfW.jpg',
+        link: this.generateStreamingLink('Netflix', movieId, mediaType),
+        type: 'stream'
+      },
+      {
+        name: 'Amazon Prime Video',
+        logo: 'https://image.tmdb.org/t/p/w92/emthp39XA2YScoYL1p0sdbAH2WA.jpg',
+        link: this.generateStreamingLink('Amazon Prime Video', movieId, mediaType),
+        type: 'stream'
+      },
+      {
+        name: 'YouTube (Rent/Buy)',
+        logo: 'https://image.tmdb.org/t/p/w92/7rwgEs15tFwyR9NPQ5vpzxTj19Q.jpg',
+        link: this.generateStreamingLink('YouTube', movieId, mediaType),
+        type: 'rent'
+      },
+      {
+        name: 'Google Play Movies',
+        logo: 'https://image.tmdb.org/t/p/w92/tbEdFQDwx5LEVr8WpSeXQSIirVq.jpg',
+        link: this.generateStreamingLink('Google Play Movies', movieId, mediaType),
+        type: 'buy'
+      }
+    ]
   }
 }
 

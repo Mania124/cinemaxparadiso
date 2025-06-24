@@ -124,21 +124,44 @@ const MovieDetails = ({ movie, onClose }) => {
 
             {streamingLinks.length > 0 && (
               <div className="streaming-section">
-                <h3>Watch Now</h3>
-                <div className="streaming-providers">
-                  {streamingLinks.map((provider, index) => (
+                <h3>🎬 Watch Now</h3>
+                <div className="watch-now-buttons">
+                  {streamingLinks.slice(0, 3).map((provider, index) => (
                     <a
                       key={index}
                       href={provider.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="streaming-link"
+                      className="watch-now-btn"
                     >
                       <img src={provider.logo} alt={provider.name} />
-                      <span>{provider.name}</span>
+                      <div className="watch-info">
+                        <span className="watch-action">Watch on</span>
+                        <span className="watch-provider">{provider.name}</span>
+                      </div>
                     </a>
                   ))}
                 </div>
+
+                {streamingLinks.length > 3 && (
+                  <div className="more-providers">
+                    <h4>More Options</h4>
+                    <div className="streaming-providers">
+                      {streamingLinks.slice(3).map((provider, index) => (
+                        <a
+                          key={index + 3}
+                          href={provider.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="streaming-link"
+                        >
+                          <img src={provider.logo} alt={provider.name} />
+                          <span>{provider.name}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

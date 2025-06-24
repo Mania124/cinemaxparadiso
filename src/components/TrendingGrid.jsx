@@ -3,15 +3,31 @@ import { AppConfig } from '../services/config'
 import { useWatchlist } from '../hooks/useWatchlist'
 import { useNotification } from '../hooks/useNotification'
 
-const TrendingGrid = ({ movies }) => {
+const TrendingGrid = ({ movies, onMovieSelect }) => {
   const { addToWatchlist } = useWatchlist()
   const { showNotification } = useNotification()
 
   if (!movies || movies.length === 0) return null
 
-  const handleAddToWatchlist = (movie) => {
+  const handleAddToWatchlist = (e, movie) => {
+    e.stopPropagation()
     addToWatchlist(movie)
     showNotification('Added to watchlist!', 'success')
+  }
+
+  const handleCardClick = (movie) => {
+    if (onMovieSelect) {
+      onMovieSelect(movie)
+    }
+  }
+
+  const handleViewDetails = (e, movie) => {
+    e.stopPropagation()
+    if (onMovieSelect) {
+      onMovieSelect(movie)
+    } else {
+      showNotification('Detailed view coming soon!', 'info')
+    }
   }
 
   return (
@@ -25,7 +41,7 @@ const TrendingGrid = ({ movies }) => {
         const popularity = movie.popularity ? Math.round(movie.popularity) : 'N/A'
 
         return (
-          <div key={movie.id} className="trending-card">
+          <div key={movie.id} className="trending-card" onClick={() => handleCardClick(movie)}>
             <div className="trending-image">
               <img src={poster} alt={title} loading="lazy" />
               <div className="trending-rating">{rating}</div>
@@ -34,11 +50,17 @@ const TrendingGrid = ({ movies }) => {
             <div className="trending-content">
               <h3 className="trending-title">{title}</h3>
               <div className="trending-actions">
-                <button 
+                <button
                   className="btn-small btn-primary"
-                  onClick={() => handleAddToWatchlist(movie)}
+                  onClick={(e) => handleAddToWatchlist(e, movie)}
                 >
-                  + Watchlist
+                  + List
+                </button>
+                <button
+                  className="btn-small btn-secondary"
+                  onClick={(e) => handleViewDetails(e, movie)}
+                >
+                  Info
                 </button>
               </div>
             </div>

@@ -1,8 +1,18 @@
 import React from 'react'
 import { AppConfig } from '../services/config'
 
-const WatchlistGrid = ({ movies, onRemove, onToggleWatched }) => {
+const WatchlistGrid = ({ movies, onRemove, onToggleWatched, onMovieSelect }) => {
   if (!movies || movies.length === 0) return null
+
+  const handleCardClick = (movie) => {
+    if (onMovieSelect) {
+      onMovieSelect(movie)
+    }
+  }
+
+  const handleButtonClick = (e) => {
+    e.stopPropagation()
+  }
 
   return (
     <div id="watchlist">
@@ -16,7 +26,7 @@ const WatchlistGrid = ({ movies, onRemove, onToggleWatched }) => {
         const watchedClass = movie.watched ? 'watched' : ''
 
         return (
-          <div key={movie.id} className={`card ${watchedClass}`} data-id={movie.id}>
+          <div key={movie.id} className={`card ${watchedClass}`} data-id={movie.id} onClick={() => handleCardClick(movie)}>
             <div className="card-image">
               <img src={poster} alt={title} loading="lazy" />
               <div className="rating">{rating}</div>
@@ -26,17 +36,32 @@ const WatchlistGrid = ({ movies, onRemove, onToggleWatched }) => {
               <h3 className="card-title">{title}</h3>
               <p className="card-type">{mediaType}</p>
               <div className="card-actions">
-                <button 
-                  className="btn-secondary" 
-                  onClick={() => onToggleWatched(movie.id)}
+                <button
+                  className="btn-secondary"
+                  onClick={(e) => {
+                    handleButtonClick(e)
+                    onToggleWatched(movie.id)
+                  }}
                 >
                   {movie.watched ? 'Mark Unwatched' : 'Mark Watched'}
                 </button>
-                <button 
-                  className="btn-danger" 
-                  onClick={() => onRemove(movie.id)}
+                <button
+                  className="btn-danger"
+                  onClick={(e) => {
+                    handleButtonClick(e)
+                    onRemove(movie.id)
+                  }}
                 >
                   Remove
+                </button>
+                <button
+                  className="btn-primary"
+                  onClick={(e) => {
+                    handleButtonClick(e)
+                    handleCardClick(movie)
+                  }}
+                >
+                  Details
                 </button>
               </div>
             </div>
